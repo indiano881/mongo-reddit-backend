@@ -1,5 +1,7 @@
 import { Request, Response, Router } from "express";
 import { User } from "../models/user";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const signUp= async (req: Request, res: Response) => {
     try {
@@ -24,6 +26,25 @@ const signUp= async (req: Request, res: Response) => {
     }
 }
 
+
+const logIn = async (req: Request, res: Response) => {
+    try {
+        const {username, password}= req.body;
+        if (!username || !password) {
+            res.status(400).json({message: "missing username or password"})
+            return //MUST PUT RETURN 
+        }
+        const user= await User.findOne({username},'+password') //becuase password is not send by default
+        if (!user ||!(await bcrypt.compare(password, user.password))) {
+            res.status(400).json({message: 'wrong username or password'})
+        }
+        const accesToken = jwt.sign({ userId: user!._id }, process.env.JWT_SECRET!, {
+            expiresIn: '1h',
+        });
+    } catch(error) {
+        res.status(500).send(); //must add send otherwise it stucks in loading mode
+    }
+}
 export const authRouter= Router();
 
 authRouter.post('/auth/sign-up',signUp)
