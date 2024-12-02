@@ -41,6 +41,8 @@ const logIn = async (req: Request, res: Response) => {
         const accesToken = jwt.sign({ userId: user!._id }, process.env.JWT_SECRET!, {
             expiresIn: '1h',
         });
+
+        res.status(200).json({accesToken, userId: user!._id})
     } catch(error) {
         res.status(500).send(); //must add send otherwise it stucks in loading mode
     }
@@ -48,3 +50,4 @@ const logIn = async (req: Request, res: Response) => {
 export const authRouter= Router();
 
 authRouter.post('/auth/sign-up',signUp)
+authRouter.post('/auth/log-in', logIn)
