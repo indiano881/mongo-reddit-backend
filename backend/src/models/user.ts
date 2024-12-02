@@ -1,4 +1,5 @@
-import { Document, model, Schema } from "mongoose";
+import { Document, model, MongooseError, Schema } from "mongoose";
+import bcrypt from "bcrypt";
 
 type UserTypes= Document & {
     username: string,
@@ -24,5 +25,23 @@ const UserSchema = new Schema({
     timestamps:true
 }
 )
+
+UserSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
+        next()
+    } 
+
+    try {
+        const hasehdPassword = await bcrypt.hash(this.password, 10)
+        this.password=hasehdPassword
+
+        next()
+
+    } catch (error) {
+        if (error instanceof MongooseError) {
+            next(error)
+        }
+    }
+})//MUST BE OLD STYLE ASYNC FUNCTION
 
 export const User = model<UserTypes>('User', UserSchema)
