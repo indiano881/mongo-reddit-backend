@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import  jwt, { decode } from "jsonwebtoken";
 import { User } from "../models/user";
-const authenticate = async(req: Request, res: Response, next: NextFunction) => {
+export const authenticate = async(req: Request, res: Response, next: NextFunction) => {
     const authHeader= req.headers['authorization']
     //it is going to be bearer empty space and the token, must use split method
     const token= authHeader?.split(' ')[1]
