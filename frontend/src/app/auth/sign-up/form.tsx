@@ -4,19 +4,19 @@ import { useForm } from "react-hook-form";
 import { signUpschema, SignUpValues } from "../../../../lib/schemas";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from "@tanstack/react-query";
-import { handleServerActionError } from "../../../../lib/error-handling";
+import { handleServerActionError, toastServerError } from "../../../../lib/error-handling";
 import { signUp } from "../../../../actions/sign-up";
-import { toast } from "sonner";
+
 
 const SignUpForm = () => {
-    const { mutate } = useMutation({
+    const { mutate, isPending } = useMutation({ //add isPending????
         mutationFn: async (values: SignUpValues) => {
             handleServerActionError(await signUp(values));
         },
-        onError: (error) => toast.error(error.message),
+        onError: toastServerError
     });
 
-    const { register, handleSubmit, formState: { errors, isSubmitting, isValid } } = useForm<SignUpValues>({
+    const { register, handleSubmit, formState: { errors } } = useForm<SignUpValues>({
         resolver: zodResolver(signUpschema),
         mode: "onChange", // Enables real-time validation feedback
     });
@@ -48,10 +48,10 @@ const SignUpForm = () => {
 
             <button
                 type="submit"
-                disabled={isSubmitting || !isValid}
-                className={`btn ${isSubmitting ? "opacity-50" : ""}`}
+                disabled={isPending }
+                className={`btn ${isPending ? "opacity-50" : ""}`}
             >
-                {isSubmitting ? "Submitting..." : "Sign Up"}
+                {isPending ? "Submitting..." : "Sign Up"}
             </button>
         </form>
     );
