@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-
+import { QueryClientProvider } from "../../providers/query-client-provider";
+import { Toaster } from "sonner";
 const noto = localFont({
   src: "./fonts/noto.ttf",
   variable: "--font-noto",
@@ -24,7 +25,11 @@ export default function RootLayout({
       <body
         className={`${noto.variable} antialiased`}
       >
+        <QueryClientProvider>
         {children}
+        <Toaster />
+        </QueryClientProvider>
+        
       </body>
     </html>
   );
