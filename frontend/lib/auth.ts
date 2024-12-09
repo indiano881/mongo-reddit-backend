@@ -40,13 +40,13 @@ const getUser= async () => {
             return null
         }
         return null
-    } catch(error) {
-        console.log(error)
+    } catch {
         return null
     }
 }
 export const auth = {
     setAccessToken, 
     deleteAccessToken, 
-    getAccessToken
+    getAccessToken,
+    getUser
 }
