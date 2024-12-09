@@ -2,6 +2,7 @@ import LogInPage from "../auth/log-in/page"
 import SignUpPage from "../auth/sign-up/page"
 import { auth } from "../../../lib/auth"
 import Link from "next/link"
+import LogOutButton from "./log-out-button"
 
 export const Header = async()=> {
 
@@ -11,9 +12,12 @@ export const Header = async()=> {
         <SignUpPage />
             <h2>------------------------</h2>
             {user ? (
+                <>
                 <Link href={'/create'}>
-                Create
+                    Create
                 </Link>
+                <LogOutButton />
+                </>
             ) : (<LogInPage />)}
         </header>
     )
