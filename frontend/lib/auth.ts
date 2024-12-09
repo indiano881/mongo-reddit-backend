@@ -2,7 +2,7 @@ import 'server-only'
 
 import { cookies } from "next/headers";
 import { client } from './client';
-import { profileSchema } from './schemas';
+import { profileSchema, ProfileValues } from './schemas';
 
 const setAccessToken= async(accessToken: string)=> {
     const cookieStore= await cookies();
@@ -17,11 +17,10 @@ const deleteAccessToken= async () => {
 
 const getAccessToken = async () => {
     const cookieStore= await cookies();
-    cookieStore.delete('access-token');
 
     return cookieStore.get('access-token')
 }
-const getUser= async () => {
+const getUser= async (): Promise<ProfileValues | null> => {
     const accessToken= await getAccessToken()
 
     if(!accessToken ) {
