@@ -18,6 +18,3 @@ mongoose.connect(process.env.DB_URL!).then(()=> {
     })
 })
 
-//app.listen(8080, ()=> {
-//   console.log("Listening on http://localhost:8080/")
-//})

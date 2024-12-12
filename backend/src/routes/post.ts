@@ -1,19 +1,42 @@
 import { Router, type Request, type Response } from "express";
 import { Post } from "../models/posts";
 import { authenticate } from "../middlewares/authenticate";
+import { ObjectId } from "mongoose";
+
+type AuthorUsernmaneConversionType = {
+    _id: ObjectId,
+    username: string
+}
 
 const getPosts= async ( req: Request, res: Response) => {
-
+    
     res.status(200).json([{title: "hello from post.ts"}, {title: "hello AgAIN post.ts"}])
     
 }
 
 const getSinglePost= async (req: Request, res: Response)=> {
+    try {
+        const {id}= req.params;
 
-    const {id}= req.params
 
-    res.status(200).json([{title: "hello from SINGLE POST post.ts", id}])
-    console.log(req)
+        const post = await Post.findById(id).populate('author', 'username')
+
+        if (!post) {
+            res.status(404).json({message: 'post not found'})
+        }
+        const author= post?.author as unknown as AuthorUsernmaneConversionType;
+        res.status(200).json({
+            id:post?._id,
+            title: post?.title,
+            content: post?.content,
+            author: {
+                id: post?.author.id,
+                username: author.username
+            }
+        })
+    } catch (error) {
+        res.status(500).send()
+    }
 }
 
 const createPost= async(req: Request , res:Response )=> {
