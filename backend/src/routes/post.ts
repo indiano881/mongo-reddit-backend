@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { Post } from "../models/posts";
 import { authenticate } from "../middlewares/authenticate";
-import { ObjectId } from "mongoose";
+import { isValidObjectId, ObjectId } from "mongoose";
 
 type AuthorUsernmaneConversionType = {
     _id: ObjectId,
@@ -9,7 +9,7 @@ type AuthorUsernmaneConversionType = {
 }
 
 const getPosts= async ( req: Request, res: Response) => {
-    
+
     res.status(200).json([{title: "hello from post.ts"}, {title: "hello AgAIN post.ts"}])
     
 }
@@ -18,7 +18,9 @@ const getSinglePost= async (req: Request, res: Response)=> {
     try {
         const {id}= req.params;
 
-
+        if (!isValidObjectId(id)) {
+            res.status(404).json({message: "invalid post id"})
+        }
         const post = await Post.findById(id).populate('author', 'username')
 
         if (!post) {
@@ -63,6 +65,34 @@ const createPost= async(req: Request , res:Response )=> {
     }
 }
 
+const deletePost= async(req: Request, res: Response)=> {
+    try{
+        const {id}= req.params;
+
+        if (!isValidObjectId(id)) {
+            res.status(404).json({message: "invalid post id"})
+            return
+        }
+
+        const post= await Post.findById(id)
+
+        if (!post) {
+            res.status(404).json({message: 'post already deleted or not founded'})
+            return
+        }
+
+        if (post.author.toString() !==req.userId) {
+            res.status(403).json({message: "you are not authorized to do this action"})
+            return
+        }
+
+        await post.deleteOne()
+        res.status(200).json({message: 'post deleted'})
+
+    } catch(error) {
+        res.status(500).send()
+    }
+}
 export const postRouter= Router();
 
 postRouter.get("/posts", getPosts);
