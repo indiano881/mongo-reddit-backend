@@ -9,9 +9,23 @@ type AuthorUsernmaneConversionType = {
 }
 
 const getPosts= async ( req: Request, res: Response) => {
-
-    res.status(200).json([{title: "hello from post.ts"}, {title: "hello AgAIN post.ts"}])
-    
+    try {
+        const posts= await Post.find().populate('author', 'username')
+        
+        res.status(200).json(posts.map((post)=> {
+            const author= post.author as unknown as AuthorUsernmaneConversionType;
+            return {
+                id: post._id,
+                title: post.title,
+                author: {
+                    username: author.username,
+                }
+            }
+        }))
+    } catch (error) {
+        res.status(500).send()
+    }
+        
 }
 
 const getSinglePost= async (req: Request, res: Response)=> {
